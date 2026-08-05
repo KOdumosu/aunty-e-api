@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ordersController = require('../controllers/orders');
+const { isAuthenticated } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -90,7 +91,7 @@ router.get('/:id', ordersController.getOrderById);
  *       400:
  *         description: Invalid input
  */
-router.post('/', ordersController.createOrder);
+router.post('/', isAuthenticated, ordersController.createOrder);
 
 /**
  * @swagger
@@ -132,7 +133,7 @@ router.post('/', ordersController.createOrder);
  *       404:
  *         description: Order not found
  */
-router.put('/:id', ordersController.updateOrder);
+router.put('/:id',isAuthenticated, ordersController.updateOrder);
 
 /**
  * @swagger
@@ -153,6 +154,6 @@ router.put('/:id', ordersController.updateOrder);
  *       404:
  *         description: Order not found
  */
-router.delete('/:id', ordersController.deleteOrder);
+router.delete('/:id', isAuthenticated, ordersController.deleteOrder);
 
 module.exports = router;
