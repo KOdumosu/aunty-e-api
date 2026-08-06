@@ -1,20 +1,21 @@
 require('dotenv').config();
 
 const express = require('express');
-const connectDB = require('./database/connect');
-const { swaggerUi, swaggerSpec } = require('./swagger');
+const session = require('express-session');
+const passport = require('./config/passport');
 
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const customerRoutes = require('./routes/customers');
 const supplierRoutes = require('./routes/suppliers');
-const session = require('express-session');
-const passport = require('./config/passport');
 const authRoutes = require('./routes/auth');
+
+const { swaggerUi, swaggerSpec } = require('./swagger');
 
 const app = express();
 
 app.use(express.json());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -22,13 +23,21 @@ app.use(
     saveUninitialized: false
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Home route
 app.get('/', (req, res) => {
   res.send("Welcome to Aunty E's Café & Mini Mart API");
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
+app.use('/orders', orderRoutes);
+app.use('/customers', customerRoutes);
+app.use('/suppliers', supplierRoutes);
 
 app.get('/profile', (req, res) => {
   if (!req.user) {
@@ -40,26 +49,4 @@ app.get('/profile', (req, res) => {
   res.json(req.user);
 });
 
-// Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Routes
-app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
-app.use('/customers', customerRoutes);
-app.use('/suppliers', supplierRoutes);
-app.use('/auth', authRoutes);
-
-
-const PORT = process.env.PORT || 3000;
-
-connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      console.log(`📚 Swagger: http://localhost:${PORT}/api-docs`);
-    });
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+module.exports = app;
