@@ -19,4 +19,17 @@ describe('Products API', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
   });
+
+  test('GET /products/:id should return a single product', async () => {
+  const allProducts = await request(app).get('/products');
+
+  const productId = allProducts.body[0]._id;
+
+  const response = await request(app).get(`/products/${productId}`);
+
+  expect(response.statusCode).toBe(200);
+  expect(response.type).toBe('application/json');
+  expect(response.body._id).toBe(productId);
+});
+
 });

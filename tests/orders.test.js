@@ -19,4 +19,17 @@ describe('Orders API', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
   });
+
+  test('GET /orders/:id should return a single order', async () => {
+  const allOrders = await request(app).get('/orders');
+
+  const orderId = allOrders.body[0]._id;
+
+  const response = await request(app).get(`/orders/${orderId}`);
+
+  expect(response.statusCode).toBe(200);
+  expect(response.type).toBe('application/json');
+  expect(response.body._id).toBe(orderId);
+});
+
 });

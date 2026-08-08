@@ -19,4 +19,16 @@ describe('Customers API', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
   });
+
+  test('GET /customers/:id should return a single customer', async () => {
+    const allCustomers = await request(app).get('/customers');
+
+    const customerId = allCustomers.body[0]._id;
+
+    const response = await request(app).get(`/customers/${customerId}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.type).toBe('application/json');
+    expect(response.body._id).toBe(customerId);
+  });
 });
